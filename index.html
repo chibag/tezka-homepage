@@ -104,6 +104,7 @@
   .news-item.has-img{ cursor:pointer; }
   .news-item.has-img:hover{ background:#f2f8fd; }
   .imgview{ padding:6px; }
+  .msgview{ padding:16px 14px; font-size:13.5px; line-height:1.9; color:#26303a; }
   .imgview img{ width:100%; display:block; }
   .news-list{ margin-top:2px; }
   .winbody.layered .news-list{ padding-right:5px; }
@@ -474,7 +475,7 @@ const INFO = {
   sign:   { name:"News", title:"News", desc:"",
             news:[["2026.12.12（土）","「テクノの嗜み」","会場：柴崎MOD（調布）\nopen 18:00 / start 18:30\nadv ¥3,000 / door ¥3,400（+1d）","live","tekuno"],["2026.11.18（水）","サイト開設","","info",""]] },
   soda:   { name:"メロンソーダ", title:"メロンソーダ", desc:"",
-            files:[["🖼","メロンソーダ.jpg","モチーフ写真"],["📄","めも.txt","グラスは半透明二重描画"]] },
+            files:[["🖼","メロンソーダ.jpg","モチーフ写真"]] },
   cage:   { name:"Birdcage", title:"Birdcage", desc:"ことりが逃げ出したようです。\n一緒にカギも持って行きました。", game:true,
             files:[] },
   covercd:{ name:"カバー音源", title:"カバー音源", desc:"", covers:true },
@@ -484,8 +485,8 @@ const INFO = {
               ["X（旧Twitter）","@TezKatly — DMでご連絡ください","https://x.com/TezKatly"],
               ["メール","tezkatli180@gmail.com","mailto:tezkatli180@gmail.com"]
             ] },
-  lantern:{ name:"ランタン", title:"ランタン", desc:"",
-            files:[["📄","めも.txt","光源つきモデル"]] },
+  lantern:{ name:"石油ストーブ", title:"石油ストーブ", desc:"",
+            files:[] },
   files:  { name:"Files", title:"Files", folder:true, items:["soda","lantern"] },
   profile:{ name:"Profile", title:"Profile", desc:"", profile:true,
             lives:[
@@ -612,9 +613,19 @@ function openImage(kind, title, src){
   body.querySelector("img").src = src;
   rec.el.querySelector(".statusbar span").textContent = title;
 }
+const NEWS_MSG = { "サイト開設": "開設しました。ここに気が付いた方は、ことりに「260322ka」と言ってみてください。" };
+function openMsg(kind, title, msg){
+  if(open.has(kind)){ restoreWin(kind); return; }
+  const rec = baseWin(kind, title);
+  rec.el.style.width = "min(370px, calc(100vw - 28px))";
+  const body = rec.el.querySelector(".body-in");
+  body.innerHTML = '<div class="msgview"></div>';
+  body.querySelector(".msgview").textContent = msg;
+  rec.el.querySelector(".statusbar span").textContent = title;
+}
 const LIVE_DETAILS = {
   tekuno: { img:"tekuno", title:"テクノの嗜み", event:"dfer vol.102",
-    rows:[["日時","2026年12月12日（土）"],["会場","柴崎MOD"],["住所","東京都調布市菊野台1-20-2 AVANT柴崎 B1F"],["時間","open 18:00 / start 18:30"],["料金","adv ¥3,000 / door ¥3,400（+1d）"],["共演","OXYMONON\nCiiFa\nMicroLlama\nFUMA\nTezKa"]] },
+    rows:[["日時","2026年12月12日（土）"],["会場","柴崎MOD"],["住所","東京都調布市菊野台1-20-2 AVANT柴崎 B1F"],["時間","open 18:00 / start 18:30"],["料金","adv ¥3,000 / door ¥3,400（+1d）"],["共演","OXYMONON\nCiiFa\nMicroLlama\nFUNA\nTezKa"]] },
   jan17: { img:"", title:"タイトル未定", event:"",
     rows:[["日時","2027年1月17日（日）"],["会場","未定"],["時間","未定"],["料金","未定"],["共演","未定"]] }
 };
@@ -792,6 +803,7 @@ function openModel(kind){
         d.querySelector(".news-title").textContent = n[1];
         if(n[2]) d.querySelector(".news-sub").textContent = n[2];
         if(n[5]) d.addEventListener("click", () => window.open(n[5], "_blank", "noopener"));
+        else if(NEWS_MSG[n[1]]) d.addEventListener("click", () => openMsg("msg-" + n[1], n[1], NEWS_MSG[n[1]]));
         else if(LIVE_DETAILS[n[4]]) d.addEventListener("click", () => openLiveDetail(n[4]));
         else if(NEWS_IMG[n[4]]) d.addEventListener("click", () => openImage("img-" + n[4], n[1], NEWS_IMG[n[4]]));
         list.appendChild(d);
@@ -891,7 +903,7 @@ function openModel(kind){
   } else if(info.covers){
     const COVERS = [ ["INTRO", "audio/cover-intro.mp3"], ["ECHOES", "audio/cover-echoes.mp3"], ["DAI9MANDARA", "audio/cover-dai9mandara.mp3"], ["BINARY_GHOST", "audio/cover-binary-ghost.mp3"], ["BYEBYE_HALYCON", "audio/cover-byebye-halycon.mp3"] ];
     const note = document.createElement("p"); note.className = "desc";
-    note.textContent = "電子レンジから出てきた音源です。";
+    note.textContent = "冷めないうちにお召し上がりください。";
     side.appendChild(note);
     const list = document.createElement("div"); list.className = "rel-list";
     side.appendChild(list);
