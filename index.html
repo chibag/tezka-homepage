@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TezKa — Personal Archive</title>
-<meta name="description" content="TezKa の作品置き場 兼 音楽活動サイト。オリジナル、リミックス、断片と3Dモデル。">
+<meta name="description" content="TezKa の作品置き場 兼 音楽活動サイト。音楽断片と3Dモデル。">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="TezKa">
 <meta property="og:title" content="TezKa — Personal Archive">
-<meta property="og:description" content="TezKa の作品置き場 兼 音楽活動サイト。オリジナル、リミックス、断片と3Dモデル。">
-<meta property="og:url" content="https://chibag.github.io/tezka-homepage/">
-<meta property="og:image" content="https://chibag.github.io/tezka-homepage/ogp.jpg">
+<meta property="og:description" content="TezKa の作品置き場 兼 音楽活動サイト。音楽断片と3Dモデル。">
+<meta property="og:url" content="https://musictezkatli.github.io/homepage/">
+<meta property="og:image" content="https://musictezkatli.github.io/homepage/ogp.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
@@ -611,7 +611,7 @@ function baseWin(kind, title){
   const casc = cascade % 5; cascade++;
   el.style.left = (innerWidth < 760 ? 4 : 16) + "px";
   el.style.top = (innerWidth < 760 ? 12 + casc * 16 : 20) + "px";
-  if(innerWidth < 760 && (kind === "tank" || kind === "room" || kind === "files" || kind === "sign" || kind === "wave")){
+  if(innerWidth < 760 && (kind === "tank" || kind === "room" || kind === "files" || kind === "sign" || kind === "wave" || kind === "coffee")){
     const ic = document.querySelector(".icon");
     if(ic) el.style.top = Math.max(0, Math.round(ic.getBoundingClientRect().top - desktop.getBoundingClientRect().top)) + "px";
   }
