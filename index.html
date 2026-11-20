@@ -5,6 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TezKa — Personal Archive</title>
 <meta name="description" content="TezKa の作品置き場 兼 音楽活動サイト。オリジナル、リミックス、断片と3Dモデル。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="TezKa">
+<meta property="og:title" content="TezKa — Personal Archive">
+<meta property="og:description" content="TezKa の作品置き場 兼 音楽活動サイト。オリジナル、リミックス、断片と3Dモデル。">
+<meta property="og:url" content="https://chibag.github.io/tezka-homepage/">
+<meta property="og:image" content="https://chibag.github.io/tezka-homepage/ogp.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='44' fill='%233fa9e8'/><ellipse cx='36' cy='32' rx='17' ry='10' fill='white' opacity='.8'/></svg>">
 <script type="importmap">
 { "imports": {
@@ -80,6 +90,10 @@
     background:radial-gradient(ellipse at 50% 42%, #f4fbff 0%, #d8eefb 62%, #bcdcf2 100%);
     box-shadow:inset 0 0 0 1px #a8c8dc; }
   .side{ flex:1; padding:12px 14px 10px 8px; min-width:0; }
+  .win[data-kind="covercd"] .side{ display:flex; flex-direction:column; overflow:hidden; min-height:0; }
+  .win[data-kind="covercd"] .side .desc{ flex:none; }
+  .win[data-kind="covercd"] .cov-player{ flex:none; }
+  .win[data-kind="covercd"] .rel-list{ flex:1; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; min-height:0; }
   .side h3{ margin:0 0 6px; font-size:16px; color:#000080; }
   .side .desc{ margin:0 0 12px; font-size:12.5px; line-height:1.75; color:#333; white-space:pre-line; }
   .winbody.layered{ position:relative; display:block; min-height:308px; }
@@ -215,6 +229,7 @@
   .folder-item span{ display:block; margin-top:4px; font-size:11.5px; color:#16324a; }
 
   /* ===== bird assistant (bottom-right) ===== */
+  body.cover-open .assistant{ z-index:5; }
   .assistant{ position:fixed; right:max(14px, calc((100vw - 1180px) / 4 + 14px)); bottom:50px; z-index:500; display:flex; flex-direction:column; align-items:flex-end; isolation:isolate; }
   .assistant canvas{ width:190px; height:172px; display:block; cursor:pointer; margin-right:4px;
     filter:drop-shadow(0 0 6px rgba(60,120,175,.55)) drop-shadow(0 5px 7px rgba(8,60,105,.5)); }
@@ -334,6 +349,7 @@
     .win{ width:570px; max-height:calc(100vh - 56px); max-height:calc(100dvh - 56px); }
     .stage canvas{ height:252px; }
     .winbody.layered{ min-height:392px; }
+    .win[data-kind="covercd"] .winbody{ height:max(230px, min(360px, calc(100dvh - 427px))); }
     .live-list{ max-height:210px; }
     .win[data-kind="sign"] .winbody.layered{ height:min(860px, calc(100vh - 120px)); }
     .win[data-kind="wave"] .winbody.layered{ height:min(860px, calc(100vh - 120px)); }
@@ -345,17 +361,18 @@
     body::before{ content:""; position:fixed; inset:0; z-index:-1;
       background:#79c6ef var(--bg) center / auto 200% no-repeat; }
     .pwidget{ left:0; right:0; bottom:44px; width:auto; border-radius:10px 10px 0 0; padding-right:26px; }
-    .mp-title{ font-size:11px; }
-    .logo h1{ font-size:34px; }
-    .icons{ grid-template-columns:repeat(2, 76px); }
-    .icon{ width:76px; } .icon canvas{ width:64px; height:49px; }
+    .mp-title{ font-size:calc(var(--uiscale, 1) * 11px); }
+    .logo h1{ font-size:calc(var(--uiscale, 1) * 34px); }
+    .icons{ grid-template-columns:repeat(2, calc(var(--uiscale, 1) * 76px)); gap:calc(var(--uiscale, 1) * 18px) calc(var(--uiscale, 1) * 12px); }
+    .icon{ width:calc(var(--uiscale, 1) * 76px); } .icon canvas{ width:calc(var(--uiscale, 1) * 64px); height:calc(var(--uiscale, 1) * 49px); }
+    .icon span{ font-size:calc(var(--uiscale, 1) * 13.5px); }
     .winbody{ flex-direction:column; }
-    .stage{ flex:none; } .stage canvas{ height:200px; }
+    .stage{ flex:none; } .stage canvas{ height:calc(var(--uiscale, 1) * 200px); }
     .side{ padding:4px 14px 12px; }
-    .assistant{ bottom:126px; }
-    .assistant canvas{ width:108px; height:97px; }
-    .balloon{ width:216px; }
-    .upd-note{ top:102px; right:10px; max-width:calc(50vw - 10px); padding:5px 8px 6px; border-radius:7px;
+    .assistant{ bottom:calc(var(--uiscale, 1) * 126px); }
+    .assistant canvas{ width:calc(var(--uiscale, 1) * 108px); height:calc(var(--uiscale, 1) * 97px); }
+    .balloon{ width:calc(var(--uiscale, 1) * 216px); }
+    .upd-note{ top:calc(var(--uiscale, 1) * 102px); right:10px; max-width:calc(50vw - 10px); padding:5px 8px 6px; border-radius:7px;
       font-size:9.5px; line-height:1.55; }
     .upd-note b{ font-size:10px; }
     .upd-note .upd-what{ font-size:8.5px; line-height:1.6; margin-top:2px; }
@@ -368,13 +385,14 @@
     .win[data-kind="sign"] .winbody.layered,
     .win[data-kind="wave"] .winbody.layered,
     .win[data-kind="profile"] .winbody.layered{ height:calc(100dvh - 240px); min-height:300px; }
+    .win[data-kind="covercd"] .winbody{ height:calc(100dvh - 215px); min-height:280px; }
     input[type="text"]{ font-size:16px; }
     .live-list{ max-height:150px; }
     html,body{ height:100%; overflow:hidden; }
     .desktop{ height:calc(100dvh - 52px); }
     .win{ max-height:calc(100dvh - 64px); }
     .live-img{ flex:0 0 48%; }
-    .profile-img{ width:88px; }
+    .profile-img{ width:calc(var(--uiscale, 1) * 88px); }
   }
 
   .cov-player{ margin-top:10px; padding:8px; background:#ece9d8; border:2px solid; border-color:#fff #aca899 #aca899 #fff; box-shadow:inset 1px 1px 0 #f1efe2, inset -1px -1px 0 #716f64; }
@@ -406,7 +424,7 @@
     <button class="icon" data-open="tank"><canvas data-three-icon="tank" width="160" height="124"></canvas><span>Links</span></button>
     <button class="icon" data-open="profile"><canvas data-three-icon="profile" width="160" height="124"></canvas><span>Profile</span></button>
   </div>
-  <div class="upd-note"><b>最終更新日</b><span>2026.11.19</span><span class="upd-what">・サイトが開設されました<br>・プロフィールにライブのフライヤーを追加<br>・ことりがたまにサーフィンします</span></div>
+  <div class="upd-note"><b>最終更新日</b><span>2026.11.20</span><span class="upd-what">・サイトが開設されました<br>・プロフィールにライブのフライヤーを追加<br>・ことりがたまにサーフィンします</span></div>
   </div>
 </div>
 
@@ -460,6 +478,14 @@
 </div>
 
 <script>
+/* mobile UI scale: iPhone 16 (393x852) = 1.0, smaller/larger phones scale to fit */
+function setUiScale(){
+  const s = Math.min(screen.width / 393, screen.height / 852);
+  const c = Math.max(0.78, Math.min(1.1, s));
+  document.documentElement.style.setProperty("--uiscale", c.toFixed(3));
+}
+setUiScale();
+window.addEventListener("orientationchange", () => setTimeout(setUiScale, 60));
 /* ================= window contents ================= */
 const INFO = {
   bird:   { name:"ことり", title:"ことり — About", desc:"",
@@ -475,7 +501,7 @@ const INFO = {
   sign:   { name:"News", title:"News", desc:"",
             news:[["2026.12.12（土）","「テクノの嗜み」","会場：柴崎MOD（調布）\nopen 18:00 / start 18:30\nadv ¥3,000 / door ¥3,400（+1d）","live","tekuno"],["2026.11.18（水）","サイト開設","","info",""]] },
   soda:   { name:"メロンソーダ", title:"メロンソーダ", desc:"",
-            files:[["🖼","メロンソーダ.jpg","モチーフ写真"]] },
+            files:[] },
   cage:   { name:"Birdcage", title:"Birdcage", desc:"ことりが逃げ出したようです。\n一緒にカギも持って行きました。", game:true,
             files:[] },
   covercd:{ name:"カバー音源", title:"カバー音源", desc:"", covers:true },
@@ -532,21 +558,28 @@ function focusWin(kind){
   rec.el.style.zIndex = ++zTop;
   document.querySelectorAll(".task").forEach(t => t.classList.toggle("on", t.dataset.kind === kind));
 }
+function syncCoverBird(){
+  const r = open.get("covercd");
+  document.body.classList.toggle("cover-open", !!r && r.el.style.display !== "none");
+}
 function closeWin(kind){
   const rec = open.get(kind); if(!rec) return;
   if(rec.viewer) rec.viewer.destroy();
   if(rec.viewers) rec.viewers.forEach(v => v.destroy());
   if(kind === "covercd" && window.__stopCoverAudio) window.__stopCoverAudio();
   rec.el.remove(); rec.btn.remove(); open.delete(kind);
+  syncCoverBird();
 }
 function minimizeWin(kind){
   const rec = open.get(kind); if(!rec) return;
   rec.el.style.display = "none";
   document.querySelectorAll(".task").forEach(t => { if(t.dataset.kind === kind) t.classList.remove("on"); });
+  syncCoverBird();
 }
 function restoreWin(kind){
   const rec = open.get(kind); if(!rec) return;
   rec.el.style.display = ""; focusWin(kind);
+  syncCoverBird();
   if(rec.viewer) requestAnimationFrame(() => rec.viewer.fit());
 }
 function makeDraggable(win, bar){
@@ -577,6 +610,10 @@ function baseWin(kind, title){
   const casc = cascade % 5; cascade++;
   el.style.left = (innerWidth < 760 ? 4 : 16) + "px";
   el.style.top = (innerWidth < 760 ? 12 + casc * 16 : 20) + "px";
+  if(innerWidth < 760 && (kind === "tank" || kind === "room" || kind === "files")){
+    const ic = document.querySelector(".icon");
+    if(ic) el.style.top = Math.max(0, Math.round(ic.getBoundingClientRect().top - desktop.getBoundingClientRect().top)) + "px";
+  }
   desktop.appendChild(el);
   if(innerWidth > 760){
     requestAnimationFrame(() => {
@@ -599,6 +636,7 @@ function baseWin(kind, title){
   tasksEl.appendChild(btn);
   const rec = { el, btn, viewer: null };
   open.set(kind, rec);
+  syncCoverBird();
   focusWin(kind);
   return rec;
 }
@@ -906,11 +944,11 @@ function openModel(kind){
     note.textContent = "冷めないうちにお召し上がりください。";
     side.appendChild(note);
     const list = document.createElement("div"); list.className = "rel-list";
-    side.appendChild(list);
     const bar = document.createElement("div"); bar.className = "cov-player";
     bar.innerHTML = '<div class="cov-row1"><button class="cov-play" type="button">▶</button><span class="cov-title">―</span><span class="cov-time">0:00 / 0:00</span></div>' +
       '<div class="cov-seek"><div class="cov-fill"></div></div>';
     side.appendChild(bar);
+    side.appendChild(list);
     const ca = new Audio(); ca.preload = "metadata"; window.__coverAudio = ca;
     let covIdx = -1; const covRows = [];
     const covPlayBtn = bar.querySelector(".cov-play"), covTitle = bar.querySelector(".cov-title"),
@@ -979,7 +1017,7 @@ function openModel(kind){
       const CAGE_PW = "おはな";
       const box = document.createElement("div"); box.className = "cage-game";
       box.innerHTML = '<div class="cage-lock">🔒 カゴのカギ</div>' +
-        '<div class="cage-row"><input class="cage-input" type="text" placeholder="パスワード">' +
+        '<div class="cage-row"><input class="cage-input" type="text" placeholder="パスワード" enterkeyhint="go">' +
         '<button class="cage-btn">開ける</button></div>' +
         '<p class="cage-status">鳥から教えてもらえましたか？</p>';
       side.appendChild(box);
@@ -995,7 +1033,7 @@ function openModel(kind){
         o.connect(gn); gn.connect(actx.destination);
         o.start(actx.currentTime + t0); o.stop(actx.currentTime + t0 + dur + 0.05);
       }catch(e){} };
-      box.querySelector(".cage-btn").addEventListener("click", () => {
+      const tryUnlock = () => {
         const v = rec.viewer || null;
         if(input.value.trim() !== CAGE_PW){
           status.textContent = "ちがうみたいです。";
@@ -1012,7 +1050,9 @@ function openModel(kind){
           else if(p === "reveal"){ status.textContent = "どうぞ温かいうちにお召し上がりください。"; openModel("covercd"); }
         };
         v.group.userData.startShow();
-      });
+      };
+      box.querySelector(".cage-btn").addEventListener("click", tryUnlock);
+      input.addEventListener("keydown", (e) => { if(e.key === "Enter"){ e.preventDefault(); tryUnlock(); } });
     }
   }
   const cv = body.querySelector("canvas");
