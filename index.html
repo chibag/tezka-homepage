@@ -91,7 +91,7 @@
     box-shadow:inset 0 0 0 1px #a8c8dc; }
   .side{ flex:1; padding:12px 14px 10px 8px; min-width:0; }
   .win[data-kind="covercd"] .side{ display:flex; flex-direction:column; overflow:hidden; min-height:0; }
-  .win[data-kind="covercd"] .side .desc{ flex:none; }
+  .win[data-kind="covercd"] .side .desc{ flex:none; margin:0 0 4px; line-height:1.5; }
   .win[data-kind="covercd"] .cov-player{ flex:none; }
   .win[data-kind="covercd"] .rel-list{ flex:1; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; min-height:0; }
   .side h3{ margin:0 0 6px; font-size:16px; color:#000080; }
@@ -391,6 +391,7 @@
     html,body{ height:100%; overflow:hidden; }
     .desktop{ height:calc(100dvh - 52px); }
     .win{ max-height:calc(100dvh - 64px); }
+    .win[data-kind^="img-"]{ width:min(300px, calc(100vw - 64px)); }
     .live-img{ flex:0 0 48%; }
     .profile-img{ width:calc(var(--uiscale, 1) * 88px); }
   }
@@ -504,7 +505,7 @@ const INFO = {
             files:[] },
   cage:   { name:"Birdcage", title:"Birdcage", desc:"ことりが逃げ出したようです。\n一緒にカギも持って行きました。", game:true,
             files:[] },
-  covercd:{ name:"カバー音源", title:"カバー音源", desc:"", covers:true },
+  covercd:{ name:"解凍データ", title:"解凍データ", desc:"", covers:true },
   coffee: { name:"Goods", title:"Goods", desc:"", empty:true },
   room:   { name:"Contact", title:"Contact", desc:"", contact:true,
             contacts:[
@@ -610,7 +611,7 @@ function baseWin(kind, title){
   const casc = cascade % 5; cascade++;
   el.style.left = (innerWidth < 760 ? 4 : 16) + "px";
   el.style.top = (innerWidth < 760 ? 12 + casc * 16 : 20) + "px";
-  if(innerWidth < 760 && (kind === "tank" || kind === "room" || kind === "files")){
+  if(innerWidth < 760 && (kind === "tank" || kind === "room" || kind === "files" || kind === "sign" || kind === "wave")){
     const ic = document.querySelector(".icon");
     if(ic) el.style.top = Math.max(0, Math.round(ic.getBoundingClientRect().top - desktop.getBoundingClientRect().top)) + "px";
   }
@@ -787,6 +788,7 @@ function openModel(kind){
     '<div class="side"><h3></h3><p class="desc"></p><div class="files"></div></div></div>';
   if(["sign","wave","room","coffee","tank","profile"].includes(kind)) body.querySelector(".winbody").classList.add("layered");
   body.querySelector("h3").textContent = info.name;
+  if(kind === "covercd") body.querySelector("h3").remove();
   const dEl = body.querySelector(".desc"); if(info.desc){ dEl.textContent = info.desc; } else { dEl.remove(); }
   const side = body.querySelector(".side");
   if(info.links){
@@ -940,6 +942,7 @@ function openModel(kind){
     rec.el.querySelector(".statusbar span").textContent = "Contact";
   } else if(info.covers){
     const COVERS = [ ["INTRO", "audio/cover-intro.mp3"], ["ECHOES", "audio/cover-echoes.mp3"], ["DAI9MANDARA", "audio/cover-dai9mandara.mp3"], ["BINARY_GHOST", "audio/cover-binary-ghost.mp3"], ["BYEBYE_HALYCON", "audio/cover-byebye-halycon.mp3"] ];
+    const TRACKLIST = (window.__coverMode === "hikaru") ? COVERS.concat([["ruin - Passion", "audio/ruin-passion.mp3", "隠しトラック"]]) : COVERS;
     const note = document.createElement("p"); note.className = "desc";
     note.textContent = "冷めないうちにお召し上がりください。";
     side.appendChild(note);
@@ -956,7 +959,7 @@ function openModel(kind){
     function covSync(){
       const playing = !ca.paused && covIdx >= 0;
       covPlayBtn.textContent = playing ? "⏸" : "▶";
-      covTitle.textContent = covIdx >= 0 ? COVERS[covIdx][0] : "―";
+      covTitle.textContent = covIdx >= 0 ? TRACKLIST[covIdx][0] : "―";
       covTime.textContent = fmtT(ca.currentTime) + " / " + fmtT(ca.duration);
       const pc = (ca.duration && isFinite(ca.duration)) ? (ca.currentTime / ca.duration * 100) : 0;
       covFill.style.width = pc + "%";
@@ -964,7 +967,7 @@ function openModel(kind){
     }
     function covLoad(i, autoplay){
       covIdx = i;
-      ca.src = COVERS[i][1];
+      ca.src = TRACKLIST[i][1];
       if(autoplay){ try{ pAudio.pause(); }catch(e){} ca.play(); }
       covSync();
     }
@@ -974,11 +977,11 @@ function openModel(kind){
       covSync();
     }
     window.__stopCoverAudio = () => { if(!ca.paused) ca.pause(); covSync(); };
-    COVERS.forEach((c, i) => {
+    TRACKLIST.forEach((c, i) => {
       const d = document.createElement("div"); d.className = "rel-item cover-row";
       d.innerHTML = '<span class="rel-main"><b></b><small></small></span><a class="cov-dl" title="ダウンロード">⬇</a><span class="rel-go">▶</span>';
       d.querySelector("b").textContent = c[0];
-      d.querySelector("small").textContent = "カバー";
+      d.querySelector("small").textContent = c[2] || "カバー";
       const dl = d.querySelector(".cov-dl"); dl.href = c[1]; dl.setAttribute("download", "");
       dl.addEventListener("click", e => e.stopPropagation());
       d.addEventListener("click", () => { if(i === covIdx) covToggle(); else covLoad(i, true); });
@@ -1000,7 +1003,7 @@ function openModel(kind){
     ca.addEventListener("pause", covSync);
     ca.addEventListener("ended", () => { if(covIdx < COVERS.length - 1) covLoad(covIdx + 1, true); else covSync(); });
     covSync();
-    rec.el.querySelector(".statusbar span").textContent = "カバー音源";
+    rec.el.querySelector(".statusbar span").textContent = "解凍データ";
   } else {
     const filesEl = body.querySelector(".files");
     info.files.forEach(f => {
@@ -1015,6 +1018,7 @@ function openModel(kind){
     rec.el.querySelector(".statusbar span").textContent = info.files.length + " 個のアイテム";
     if(info.game){
       const CAGE_PW = "おはな";
+      const CAGE_PW2 = "ひかる";
       const box = document.createElement("div"); box.className = "cage-game";
       box.innerHTML = '<div class="cage-lock">🔒 カゴのカギ</div>' +
         '<div class="cage-row"><input class="cage-input" type="text" placeholder="パスワード" enterkeyhint="go">' +
@@ -1035,12 +1039,14 @@ function openModel(kind){
       }catch(e){} };
       const tryUnlock = () => {
         const v = rec.viewer || null;
-        if(input.value.trim() !== CAGE_PW){
+        const pwv = input.value.trim();
+        if(pwv !== CAGE_PW && pwv !== CAGE_PW2){
           status.textContent = "ちがうみたいです。";
           input.classList.remove("shake"); void input.offsetWidth; input.classList.add("shake");
           return;
         }
         if(!v || !v.group || !v.group.userData.startShow){ status.textContent = "もう一度開き直してみてください。"; return; }
+        window.__coverMode = (pwv === CAGE_PW2) ? "hikaru" : "normal";
         status.textContent = "…";
         v.group.userData.onPhase = (p) => {
           if(p === "door"){ beep(1320, 0, 0.09); }
@@ -1166,6 +1172,10 @@ function birdSearch(){
   }
   if(q === "260322ka"){
     document.getElementById("balloon-msg").textContent = "パスワードは「おはな」です。ことりはうそをつきません。";
+    return;
+  }
+  if(q === "260612mi"){
+    document.getElementById("balloon-msg").textContent = "パスワードは「ひかる」です。ことりはうそをつきません。";
     return;
   }
   if(q.indexOf("パスワード") >= 0){
