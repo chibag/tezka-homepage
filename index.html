@@ -484,9 +484,35 @@ function setUiScale(){
   const s = Math.min(screen.width / 393, screen.height / 852);
   const c = Math.max(0.78, Math.min(1.1, s));
   document.documentElement.style.setProperty("--uiscale", c.toFixed(3));
+  fitIconGrid(c);
+}
+/* In short viewports (e.g. an app's built-in browser) shrink the mobile UI
+   just enough that every icon stays visible above the player/taskbar. */
+function fitIconGrid(base){
+  const asst = document.getElementById("assistant");
+  if(asst) asst.style.bottom = "";
+  if(window.innerWidth > 760) return;
+  requestAnimationFrame(() => {
+    const grid = document.getElementById("icons");
+    if(!grid) return;
+    const pw = document.getElementById("pwidget");
+    const tb = document.querySelector(".taskbar");
+    let limit = window.innerHeight;
+    if(pw && pw.offsetHeight > 0) limit = Math.min(limit, pw.getBoundingClientRect().top);
+    else if(tb) limit = Math.min(limit, tb.getBoundingClientRect().top);
+    const r = grid.getBoundingClientRect();
+    const over = r.bottom - limit;
+    if(over > 2 && r.height > 0){
+      const next = Math.max(0.55, base * (r.height - over) / r.height);
+      document.documentElement.style.setProperty("--uiscale", next.toFixed(3));
+      if(asst) asst.style.bottom = Math.round(126 * base) + "px";
+    }
+  });
 }
 setUiScale();
 window.addEventListener("orientationchange", () => setTimeout(setUiScale, 60));
+window.addEventListener("resize", () => setTimeout(setUiScale, 60));
+window.addEventListener("load", () => setTimeout(setUiScale, 50));
 /* ================= window contents ================= */
 const INFO = {
   bird:   { name:"ことり", title:"ことり — About", desc:"",
