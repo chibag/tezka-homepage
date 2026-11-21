@@ -372,6 +372,11 @@
     .assistant{ bottom:calc(var(--uiscale, 1) * 126px); }
     .assistant canvas{ width:calc(var(--uiscale, 1) * 108px); height:calc(var(--uiscale, 1) * 97px); }
     .balloon{ width:calc(var(--uiscale, 1) * 216px); }
+    body.compact .desktop{ position:relative; }
+    body.compact .logo{ position:absolute; top:0; left:0; right:0; z-index:0; margin:0; text-align:left; padding-left:16px; }
+    body.compact .icons{ position:relative; z-index:1; }
+    body.compact .desktop{ padding-top:6px; }
+    body.compact .upd-note{ top:10px; }
     .upd-note{ top:calc(var(--uiscale, 1) * 102px); right:10px; max-width:calc(50vw - 10px); padding:5px 8px 6px; border-radius:7px;
       font-size:9.5px; line-height:1.55; }
     .upd-note b{ font-size:10px; }
@@ -491,21 +496,31 @@ function setUiScale(){
 function fitIconGrid(base){
   const asst = document.getElementById("assistant");
   if(asst) asst.style.bottom = "";
+  document.body.classList.remove("compact");
   if(window.innerWidth > 760) return;
   requestAnimationFrame(() => {
     const grid = document.getElementById("icons");
     if(!grid) return;
     const pw = document.getElementById("pwidget");
     const tb = document.querySelector(".taskbar");
-    let limit = window.innerHeight;
-    if(pw && pw.offsetHeight > 0) limit = Math.min(limit, pw.getBoundingClientRect().top);
-    else if(tb) limit = Math.min(limit, tb.getBoundingClientRect().top);
-    const r = grid.getBoundingClientRect();
-    const over = r.bottom - limit;
-    if(over > 2 && r.height > 0){
-      const next = Math.max(0.55, base * (r.height - over) / r.height);
-      document.documentElement.style.setProperty("--uiscale", next.toFixed(3));
-      if(asst) asst.style.bottom = Math.round(126 * base) + "px";
+    const limit = () => {
+      let l = window.innerHeight;
+      if(pw && pw.offsetHeight > 0) l = Math.min(l, pw.getBoundingClientRect().top);
+      else if(tb) l = Math.min(l, tb.getBoundingClientRect().top);
+      return l;
+    };
+    let r = grid.getBoundingClientRect();
+    if(r.bottom - limit() > 2){
+      /* short viewport (e.g. an app's built-in browser): hide the welcome
+         logo and pack the icons into the freed space first */
+      document.body.classList.add("compact");
+      r = grid.getBoundingClientRect();
+      const over = r.bottom - limit();
+      if(over > 2 && r.height > 0){
+        const next = Math.max(0.55, base * (r.height - over) / r.height);
+        document.documentElement.style.setProperty("--uiscale", next.toFixed(3));
+        if(asst) asst.style.bottom = Math.round(126 * base) + "px";
+      }
     }
   });
 }
