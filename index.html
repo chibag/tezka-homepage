@@ -455,7 +455,7 @@
   <button class="mp-close" title="閉じる">✕</button>
 </div>
 <div class="startmenu" id="startmenu">
-  <div class="head"><span>TezKa</span><span class="head-ver">v286</span></div>
+  <div class="head"><span>TezKa</span><span class="head-ver">v287</span></div>
   <button data-open="profile">👤　Profile</button>
   <button data-open="player">▶️　Preview</button>
   <button data-open="wave">🎵　Works</button>
@@ -1227,14 +1227,26 @@ function birdSearch(){
     document.getElementById("balloon-msg").textContent = "パスワードは「ひかる」です。ことりはうそをつきません。";
     return;
   }
+  if(q.indexOf("サーフィン") >= 0){
+    document.getElementById("balloon-msg").textContent = "もちろん。しんしの たしなみですから。";
+    return;
+  }
+  if(q.indexOf("ボイパ") >= 0 || q.indexOf("ボイスパーカッション") >= 0){
+    try{
+      if(window.__boipaAudio) window.__boipaAudio.pause();
+      const ba = new Audio("audio/boipa.mp3"); ba.volume = 0.5;
+      window.__boipaAudio = ba;
+      ba.play().catch(() => {});
+    }catch(e){}
+    document.getElementById("balloon-msg").textContent = "（ことりは、ボイスパーカッションをしています）";
+    return;
+  }
   if(q.indexOf("パスワード") >= 0){
     document.getElementById("balloon-msg").textContent = "なんかライブのひにちと かんけいがあるきがしてきたな～。";
     return;
   }
-  const r = Math.random();
-  const others = ["ピー！！！", "ﾁｭﾝﾁｭﾝ（ことりは、最もことりらしい声で鳴いています）", "わからなくたって いいじゃない", "かのうせいは ありますね", "いいおんがくですね。", "いいてんきだな。"];
-  document.getElementById("balloon-msg").textContent =
-    r < 0.50 ? "わかりません。ことりなので。" : others[Math.min(5, Math.floor((r - 0.50) * 12))];
+  const pool = ["わかりません。ことりなので。", "ピー！！！", "ﾁｭﾝﾁｭﾝ（ことりは、最もことりらしい声で鳴いています）", "わからなくたって いいじゃない", "かのうせいは ありますね", "いいおんがくですね。", "いいてんきだな。", "ちょっと ハイがつよくないですか？", "めまぐるしい よのなかだ。", "かごはちょっと せまいんです。", "いるかは しいたげられがち。"];
+  document.getElementById("balloon-msg").textContent = pool[Math.floor(Math.random() * pool.length)];
 }
 document.getElementById("balloon-search").addEventListener("click", birdSearch);
 document.getElementById("balloon-input").addEventListener("keydown", e => { if(e.key === "Enter") birdSearch(); });
