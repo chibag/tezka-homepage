@@ -373,12 +373,10 @@
     .assistant{ bottom:calc(var(--uiscale, 1) * 126px); }
     .assistant canvas{ width:calc(var(--uiscale, 1) * 108px); height:calc(var(--uiscale, 1) * 97px); }
     .balloon{ width:calc(var(--uiscale, 1) * 216px); }
-    body.compact .desktop{ position:relative; }
-    body.compact .logo{ position:absolute; top:4px; right:12px; left:auto; z-index:0; margin:0; text-align:right; }
-    body.compact .icons{ position:relative; z-index:1; }
-    body.compact .desktop{ padding-top:6px; }
-    body.compact .upd-note{ top:calc(var(--uiscale, 1) * 46px + 10px); }
-    .upd-note{ top:calc(var(--uiscale, 1) * 102px); right:10px; max-width:calc(50vw - 10px); padding:5px 8px 6px; border-radius:7px;
+    .desktop{ position:relative; padding-top:6px; }
+    .logo{ position:absolute; top:4px; right:12px; left:auto; z-index:0; margin:0; text-align:right; }
+    .icons{ position:relative; z-index:1; }
+    .upd-note{ top:calc(var(--uiscale, 1) * 46px + 10px); right:10px; max-width:calc(50vw - 10px); padding:5px 8px 6px; border-radius:7px;
       font-size:9.5px; line-height:1.55; }
     .upd-note b{ font-size:10px; }
     .upd-note .upd-what{ font-size:8.5px; line-height:1.6; margin-top:2px; }
@@ -455,7 +453,7 @@
   <button class="mp-close" title="閉じる">✕</button>
 </div>
 <div class="startmenu" id="startmenu">
-  <div class="head"><span>TezKa</span><span class="head-ver">v296</span></div>
+  <div class="head"><span>TezKa</span><span class="head-ver">v297</span></div>
   <button data-open="profile">👤　Profile</button>
   <button data-open="player">▶️　Preview</button>
   <button data-open="wave">🎵　Works</button>
@@ -524,7 +522,6 @@ function fitIconGrid(base){
   if(hNow > refH) refH = hNow;
   const asst = document.getElementById("assistant");
   if(asst) asst.style.bottom = "";
-  document.body.classList.remove("compact");
   requestAnimationFrame(() => {
     if(window.innerHeight !== hNow){ setTimeout(() => fitIconGrid(base), 220); return; }
     const grid = document.getElementById("icons");
@@ -538,17 +535,13 @@ function fitIconGrid(base){
       return l;
     };
     let r = grid.getBoundingClientRect();
-    if(r.bottom - limit() > 2){
-      /* short viewport (e.g. an app's built-in browser): hide the welcome
-         logo and pack the icons into the freed space first */
-      document.body.classList.add("compact");
-      r = grid.getBoundingClientRect();
-      const over = r.bottom - limit();
-      if(over > 2 && r.height > 0){
-        const next = Math.max(0.55, base * (r.height - over) / r.height);
-        document.documentElement.style.setProperty("--uiscale", next.toFixed(3));
-        if(asst) asst.style.bottom = Math.round(126 * base) + "px";
-      }
+    const over = r.bottom - limit();
+    if(over > 2 && r.height > 0){
+      /* only the icon scale auto-adjusts now; the header layout is fixed.
+         A few px of headroom keeps the shrunk state from flip-flopping. */
+      const next = Math.max(0.55, base * (r.height - over - 6) / r.height);
+      document.documentElement.style.setProperty("--uiscale", next.toFixed(3));
+      if(asst) asst.style.bottom = Math.round(126 * base) + "px";
     }
   });
 }
