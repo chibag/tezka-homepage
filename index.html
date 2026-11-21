@@ -517,13 +517,13 @@ const INFO = {
   files:  { name:"Files", title:"Files", folder:true, items:["soda","lantern"] },
   profile:{ name:"Profile", title:"Profile", desc:"", profile:true,
             lives:[
-              ["2026.12.12（土）","テクノの嗜み","柴崎MOD（予定）","tekuno"],
-              ["2026.06.13（土）","millennium2000","下北沢LIVE HAUS","millennium"],
-              ["2025.05.25（日）","おんがくのじかん SHOWCASE.300","三鷹おんがくのじかん","ongaku"],
-              ["2025.02.23（日）","ALL THINGS MUST PASS vol.1","Channel For Rent（池上）","atmp"],
-              ["2024.01.14（日）","MIRACLE×CROSS「縁」","大塚Hearts+／Hearts Next","miracro"],
+              ["2022.08.28（日）","第一回東訪公会議","吉祥寺GOK SOUND","touhou1"],
               ["2023.09.16（土）","第二回東訪公会議","江古田ドロシー","touhou2"],
-              ["2022.08.28（日）","第一回東訪公会議","吉祥寺GOK SOUND","touhou1"]
+              ["2024.01.14（日）","MIRACLE×CROSS「縁」","大塚Hearts+／Hearts Next","miracro"],
+              ["2025.02.23（日）","ALL THINGS MUST PASS vol.1","Channel For Rent（池上）","atmp"],
+              ["2025.05.25（日）","おんがくのじかん SHOWCASE.300","三鷹おんがくのじかん","ongaku"],
+              ["2026.06.13（土）","millennium2000","下北沢LIVE HAUS","millennium"],
+              ["2026.12.12（土）","テクノの嗜み","柴崎MOD（予定）","tekuno"]
             ],
             relHist:[
               ["2022.05.17","デジャヴをどうぞ","シングル","dejavu"],
@@ -942,7 +942,10 @@ function openModel(kind){
     rec.el.querySelector(".statusbar span").textContent = "Contact";
   } else if(info.covers){
     const COVERS = [ ["INTRO", "audio/cover-intro.mp3"], ["ECHOES", "audio/cover-echoes.mp3"], ["DAI9MANDARA", "audio/cover-dai9mandara.mp3"], ["BINARY_GHOST", "audio/cover-binary-ghost.mp3"], ["BYEBYE_HALYCON", "audio/cover-byebye-halycon.mp3"] ];
-    const TRACKLIST = (window.__coverMode === "hikaru") ? COVERS.concat([["ruin - Passion", "audio/ruin-passion.mp3", "隠しトラック"]]) : COVERS;
+    const TRACKLIST = (window.__coverMode === "hikaru") ? [["ruin - Passion", "audio/ruin-passion.mp3", "隠しトラック"]] : COVERS;
+    const covWinTitle = (window.__coverMode === "hikaru") ? "2026.06.12_解凍データ" : "2026.03.22_解凍データ";
+    rec.el.querySelector(".titlebar b").textContent = covWinTitle;
+    if(rec.btn) rec.btn.textContent = covWinTitle;
     const note = document.createElement("p"); note.className = "desc";
     note.textContent = "冷めないうちにお召し上がりください。";
     side.appendChild(note);
@@ -981,7 +984,7 @@ function openModel(kind){
       const d = document.createElement("div"); d.className = "rel-item cover-row";
       d.innerHTML = '<span class="rel-main"><b></b><small></small></span><a class="cov-dl" title="ダウンロード">⬇</a><span class="rel-go">▶</span>';
       d.querySelector("b").textContent = c[0];
-      d.querySelector("small").textContent = c[2] || "カバー";
+      d.querySelector("small").textContent = c[2] || "";
       const dl = d.querySelector(".cov-dl"); dl.href = c[1]; dl.setAttribute("download", "");
       dl.addEventListener("click", e => e.stopPropagation());
       d.addEventListener("click", () => { if(i === covIdx) covToggle(); else covLoad(i, true); });
@@ -1003,7 +1006,7 @@ function openModel(kind){
     ca.addEventListener("pause", covSync);
     ca.addEventListener("ended", () => { if(covIdx < COVERS.length - 1) covLoad(covIdx + 1, true); else covSync(); });
     covSync();
-    rec.el.querySelector(".statusbar span").textContent = "解凍データ";
+    rec.el.querySelector(".statusbar span").textContent = covWinTitle;
   } else {
     const filesEl = body.querySelector(".files");
     info.files.forEach(f => {
@@ -1053,7 +1056,7 @@ function openModel(kind){
           else if(p === "click"){ beep(1200, 0, 0.06); }
           else if(p === "warm"){ status.textContent = "温め中…"; }
           else if(p === "ding"){ beep(1568, 0, 0.12); beep(2093, 0.13, 0.22); }
-          else if(p === "reveal"){ status.textContent = "どうぞ温かいうちにお召し上がりください。"; openModel("covercd"); }
+          else if(p === "reveal"){ status.textContent = "どうぞ温かいうちにお召し上がりください。"; if(open.has("covercd")) closeWin("covercd"); openModel("covercd"); }
         };
         v.group.userData.startShow();
       };
