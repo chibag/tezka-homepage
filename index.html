@@ -373,10 +373,10 @@
     .assistant canvas{ width:calc(var(--uiscale, 1) * 108px); height:calc(var(--uiscale, 1) * 97px); }
     .balloon{ width:calc(var(--uiscale, 1) * 216px); }
     body.compact .desktop{ position:relative; }
-    body.compact .logo{ position:absolute; top:0; left:0; right:0; z-index:0; margin:0; text-align:left; padding-left:16px; }
+    body.compact .logo{ position:absolute; top:4px; right:12px; left:auto; z-index:0; margin:0; text-align:right; }
     body.compact .icons{ position:relative; z-index:1; }
     body.compact .desktop{ padding-top:6px; }
-    body.compact .upd-note{ top:10px; }
+    body.compact .upd-note{ top:calc(var(--uiscale, 1) * 46px + 10px); }
     .upd-note{ top:calc(var(--uiscale, 1) * 102px); right:10px; max-width:calc(50vw - 10px); padding:5px 8px 6px; border-radius:7px;
       font-size:9.5px; line-height:1.55; }
     .upd-note b{ font-size:10px; }
