@@ -393,6 +393,7 @@
     .win[data-kind="profile"] .winbody.layered{ height:calc(100dvh - 240px); min-height:300px; }
     .win[data-kind="covercd"] .winbody{ height:calc(100dvh - 215px); min-height:280px; }
     input[type="text"]{ font-size:16px; }
+    .balloon input, .cage-input{ font-size:16px; }
     .live-list{ max-height:150px; }
     html,body{ height:100%; overflow:hidden; }
     .desktop{ height:calc(100dvh - 52px); }
@@ -454,7 +455,7 @@
   <button class="mp-close" title="閉じる">✕</button>
 </div>
 <div class="startmenu" id="startmenu">
-  <div class="head"><span>TezKa</span><span class="head-ver">v284</span></div>
+  <div class="head"><span>TezKa</span><span class="head-ver">v286</span></div>
   <button data-open="profile">👤　Profile</button>
   <button data-open="player">▶️　Preview</button>
   <button data-open="wave">🎵　Works</button>
@@ -494,7 +495,9 @@ function setUiScale(){
 }
 /* In short viewports (e.g. an app's built-in browser) shrink the mobile UI
    just enough that every icon stays visible above the player/taskbar. */
+const typingNow = () => { const a = document.activeElement; return !!a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA"); };
 function fitIconGrid(base){
+  if(typingNow()) return;
   const asst = document.getElementById("assistant");
   if(asst) asst.style.bottom = "";
   document.body.classList.remove("compact");
@@ -527,7 +530,8 @@ function fitIconGrid(base){
 }
 setUiScale();
 window.addEventListener("orientationchange", () => setTimeout(setUiScale, 60));
-window.addEventListener("resize", () => setTimeout(setUiScale, 60));
+window.addEventListener("resize", () => { if(!typingNow()) setTimeout(setUiScale, 60); });
+document.addEventListener("focusout", () => setTimeout(() => { if(!typingNow()) setUiScale(); }, 300));
 window.addEventListener("load", () => setTimeout(setUiScale, 50));
 /* ================= window contents ================= */
 const INFO = {
@@ -545,7 +549,7 @@ const INFO = {
             news:[["2026.12.12（土）","「テクノの嗜み」","会場：柴崎MOD（調布）\nopen 18:00 / start 18:30\nadv ¥3,000 / door ¥3,400（+1d）","live","tekuno"],["2026.11.18（水）","サイト開設","","info",""]] },
   soda:   { name:"メロンソーダ", title:"メロンソーダ", desc:"",
             files:[] },
-  cage:   { name:"Birdcage", title:"Birdcage", desc:"ことりが逃げ出したようです。\n一緒にカギも持って行きました。", game:true,
+  cage:   { name:"Birdcage", title:"Birdcage", desc:"ことりが逃げ出したようです。", game:true,
             files:[] },
   covercd:{ name:"解凍データ", title:"解凍データ", desc:"", covers:true },
   coffee: { name:"Goods", title:"Goods", desc:"", empty:true },
@@ -830,7 +834,7 @@ function openModel(kind){
     '<div class="side"><h3></h3><p class="desc"></p><div class="files"></div></div></div>';
   if(["sign","wave","room","coffee","tank","profile"].includes(kind)) body.querySelector(".winbody").classList.add("layered");
   body.querySelector("h3").textContent = info.name;
-  if(kind === "covercd") body.querySelector("h3").remove();
+  if(kind === "covercd" || kind === "cage") body.querySelector("h3").remove();
   const dEl = body.querySelector(".desc"); if(info.desc){ dEl.textContent = info.desc; } else { dEl.remove(); }
   const side = body.querySelector(".side");
   if(info.links){
@@ -1066,7 +1070,7 @@ function openModel(kind){
       const CAGE_PW2 = "ひかる";
       const box = document.createElement("div"); box.className = "cage-game";
       box.innerHTML = '<div class="cage-lock">🔒 カゴのカギ</div>' +
-        '<div class="cage-row"><input class="cage-input" type="text" placeholder="パスワード" enterkeyhint="go">' +
+        '<div class="cage-row"><input class="cage-input" type="text" placeholder="カゴのカギ" enterkeyhint="go">' +
         '<button class="cage-btn">開ける</button></div>' +
         '<p class="cage-status">鳥から教えてもらえましたか？</p>';
       side.appendChild(box);
@@ -1086,7 +1090,7 @@ function openModel(kind){
         const v = rec.viewer || null;
         const pwv = input.value.trim();
         if(pwv !== CAGE_PW && pwv !== CAGE_PW2){
-          status.textContent = "ちがうみたいです。";
+          status.textContent = "違うみたいです。ことりに聞いてみてもいいかもしれません。";
           input.classList.remove("shake"); void input.offsetWidth; input.classList.add("shake");
           return;
         }
