@@ -455,7 +455,7 @@
   <button class="mp-close" title="閉じる">✕</button>
 </div>
 <div class="startmenu" id="startmenu">
-  <div class="head"><span>TezKa</span><span class="head-ver">v291</span></div>
+  <div class="head"><span>TezKa</span><span class="head-ver">v292</span></div>
   <button data-open="profile">👤　Profile</button>
   <button data-open="player">▶️　Preview</button>
   <button data-open="wave">🎵　Works</button>
@@ -501,6 +501,11 @@ const typingNow = () => { const a = document.activeElement; return !!a && (a.tag
    the fit then stops the layout from flipping out of compact mode when the
    user merely confirms text in an input. */
 let kbFreezeUntil = 0;
+/* App browsers pan the whole page to reveal a focused input; with the page
+   scroll locked, that pan can stick and strand windows off-screen. Snap the
+   scroll back to 0 whenever no input is focused (mobile layout only). */
+const resetScroll = () => { if(window.innerWidth <= 760 && (window.scrollX !== 0 || window.scrollY !== 0)) window.scrollTo(0, 0); };
+window.addEventListener("scroll", () => { if(!typingNow()) resetScroll(); }, { passive:true });
 document.addEventListener("focusin", e => {
   if(e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) kbFreezeUntil = Date.now() + 600000;
 });
@@ -538,10 +543,11 @@ function fitIconGrid(base){
 }
 setUiScale();
 window.addEventListener("orientationchange", () => setTimeout(setUiScale, 60));
-window.addEventListener("resize", () => { if(!typingNow() && Date.now() >= kbFreezeUntil) setTimeout(setUiScale, 60); });
+window.addEventListener("resize", () => { if(!typingNow() && Date.now() >= kbFreezeUntil){ resetScroll(); setTimeout(setUiScale, 60); } });
 document.addEventListener("focusout", () => {
+  resetScroll();
   kbFreezeUntil = Date.now() + 1000;
-  setTimeout(() => { kbFreezeUntil = 0; if(!typingNow()) setUiScale(); }, 1050);
+  setTimeout(() => { kbFreezeUntil = 0; if(!typingNow()){ resetScroll(); setUiScale(); } }, 1050);
 });
 window.addEventListener("load", () => setTimeout(setUiScale, 50));
 /* ================= window contents ================= */
@@ -1118,7 +1124,7 @@ function openModel(kind){
         v.group.userData.startShow();
       };
       box.querySelector(".cage-btn").addEventListener("click", tryUnlock);
-      input.addEventListener("keydown", (e) => { if(e.key === "Enter"){ e.preventDefault(); tryUnlock(); } });
+      input.addEventListener("keydown", (e) => { if(e.key === "Enter"){ e.preventDefault(); tryUnlock(); input.blur(); } });
     }
   }
   const cv = body.querySelector("canvas");
@@ -1260,7 +1266,7 @@ function birdSearch(){
   document.getElementById("balloon-msg").textContent = pool[Math.floor(Math.random() * pool.length)];
 }
 document.getElementById("balloon-search").addEventListener("click", birdSearch);
-document.getElementById("balloon-input").addEventListener("keydown", e => { if(e.key === "Enter") birdSearch(); });
+document.getElementById("balloon-input").addEventListener("keydown", e => { if(e.key === "Enter"){ birdSearch(); e.target.blur(); } });
 
 function tickClock(){
   const d = new Date();
