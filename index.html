@@ -455,7 +455,7 @@
   <button class="mp-close" title="閉じる">✕</button>
 </div>
 <div class="startmenu" id="startmenu">
-  <div class="head"><span>TezKa</span><span class="head-ver">v290</span></div>
+  <div class="head"><span>TezKa</span><span class="head-ver">v291</span></div>
   <button data-open="profile">👤　Profile</button>
   <button data-open="player">▶️　Preview</button>
   <button data-open="wave">🎵　Works</button>
@@ -496,8 +496,16 @@ function setUiScale(){
 /* In short viewports (e.g. an app's built-in browser) shrink the mobile UI
    just enough that every icon stays visible above the player/taskbar. */
 const typingNow = () => { const a = document.activeElement; return !!a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA"); };
+/* While the keyboard is up — and for a second after it closes — the
+   viewport height is in flux (keyboard slide + toolbar settling). Freezing
+   the fit then stops the layout from flipping out of compact mode when the
+   user merely confirms text in an input. */
+let kbFreezeUntil = 0;
+document.addEventListener("focusin", e => {
+  if(e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) kbFreezeUntil = Date.now() + 600000;
+});
 function fitIconGrid(base){
-  if(typingNow()) return;
+  if(typingNow() || Date.now() < kbFreezeUntil) return;
   const asst = document.getElementById("assistant");
   if(asst) asst.style.bottom = "";
   document.body.classList.remove("compact");
@@ -530,8 +538,11 @@ function fitIconGrid(base){
 }
 setUiScale();
 window.addEventListener("orientationchange", () => setTimeout(setUiScale, 60));
-window.addEventListener("resize", () => { if(!typingNow()) setTimeout(setUiScale, 60); });
-document.addEventListener("focusout", () => setTimeout(() => { if(!typingNow()) setUiScale(); }, 300));
+window.addEventListener("resize", () => { if(!typingNow() && Date.now() >= kbFreezeUntil) setTimeout(setUiScale, 60); });
+document.addEventListener("focusout", () => {
+  kbFreezeUntil = Date.now() + 1000;
+  setTimeout(() => { kbFreezeUntil = 0; if(!typingNow()) setUiScale(); }, 1050);
+});
 window.addEventListener("load", () => setTimeout(setUiScale, 50));
 /* ================= window contents ================= */
 const INFO = {
