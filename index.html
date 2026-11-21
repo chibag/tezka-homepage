@@ -455,7 +455,7 @@
   <button class="mp-close" title="閉じる">✕</button>
 </div>
 <div class="startmenu" id="startmenu">
-  <div class="head"><span>TezKa</span><span class="head-ver">v294</span></div>
+  <div class="head"><span>TezKa</span><span class="head-ver">v295</span></div>
   <button data-open="profile">👤　Profile</button>
   <button data-open="player">▶️　Preview</button>
   <button data-open="wave">🎵　Works</button>
@@ -509,13 +509,24 @@ window.addEventListener("scroll", () => { if(!typingNow()) resetScroll(); }, { p
 document.addEventListener("focusin", e => {
   if(e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) kbFreezeUntil = Date.now() + 600000;
 });
+/* The fit is judged against the viewport height captured when the page
+   settled (refH). While the live height is well below that, the keyboard
+   or browser chrome is still in motion: leave the layout exactly as it is
+   instead of resetting and re-deriving it from a transient measurement
+   (that flip is what moved tap targets and the welcome logo). */
+let refH = 0;
 function fitIconGrid(base){
   if(typingNow() || Date.now() < kbFreezeUntil) return;
+  if(window.innerWidth > 760) return;
+  const hNow = window.innerHeight;
+  if(!refH) refH = hNow;
+  if(hNow < refH - 60) return;
+  if(hNow > refH) refH = hNow;
   const asst = document.getElementById("assistant");
   if(asst) asst.style.bottom = "";
   document.body.classList.remove("compact");
-  if(window.innerWidth > 760) return;
   requestAnimationFrame(() => {
+    if(window.innerHeight !== hNow){ setTimeout(() => fitIconGrid(base), 220); return; }
     const grid = document.getElementById("icons");
     if(!grid) return;
     const pw = document.getElementById("pwidget");
@@ -542,7 +553,7 @@ function fitIconGrid(base){
   });
 }
 setUiScale();
-window.addEventListener("orientationchange", () => setTimeout(setUiScale, 60));
+window.addEventListener("orientationchange", () => setTimeout(() => { refH = 0; setUiScale(); }, 60));
 window.addEventListener("resize", () => { if(!typingNow() && Date.now() >= kbFreezeUntil){ resetScroll(); setTimeout(setUiScale, 60); } });
 document.addEventListener("focusout", () => {
   resetScroll();
