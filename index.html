@@ -455,7 +455,7 @@
   <button class="mp-close" title="閉じる">✕</button>
 </div>
 <div class="startmenu" id="startmenu">
-  <div class="head"><span>TezKa</span><span class="head-ver">v293</span></div>
+  <div class="head"><span>TezKa</span><span class="head-ver">v294</span></div>
   <button data-open="profile">👤　Profile</button>
   <button data-open="player">▶️　Preview</button>
   <button data-open="wave">🎵　Works</button>
@@ -504,7 +504,7 @@ let kbFreezeUntil = 0;
 /* App browsers pan the whole page to reveal a focused input; with the page
    scroll locked, that pan can stick and strand windows off-screen. Snap the
    scroll back to 0 whenever no input is focused (mobile layout only). */
-const resetScroll = () => { if(window.innerWidth <= 760 && (window.scrollX !== 0 || window.scrollY !== 0)) window.scrollTo(0, 0); };
+const resetScroll = () => { if(window.innerWidth <= 760){ try{ window.scrollTo(0, 0); }catch(e){} } };
 window.addEventListener("scroll", () => { if(!typingNow()) resetScroll(); }, { passive:true });
 document.addEventListener("focusin", e => {
   if(e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) kbFreezeUntil = Date.now() + 600000;
@@ -546,6 +546,8 @@ window.addEventListener("orientationchange", () => setTimeout(setUiScale, 60));
 window.addEventListener("resize", () => { if(!typingNow() && Date.now() >= kbFreezeUntil){ resetScroll(); setTimeout(setUiScale, 60); } });
 document.addEventListener("focusout", () => {
   resetScroll();
+  setTimeout(resetScroll, 120);
+  setTimeout(resetScroll, 400);
   kbFreezeUntil = Date.now() + 1000;
   setTimeout(() => { kbFreezeUntil = 0; if(!typingNow()){ resetScroll(); setUiScale(); } }, 1050);
 });
