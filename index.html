@@ -455,7 +455,7 @@
   <button class="mp-close" title="閉じる">✕</button>
 </div>
 <div class="startmenu" id="startmenu">
-  <div class="head"><span>TezKa</span><span class="head-ver">v295</span></div>
+  <div class="head"><span>TezKa</span><span class="head-ver">v296</span></div>
   <button data-open="profile">👤　Profile</button>
   <button data-open="player">▶️　Preview</button>
   <button data-open="wave">🎵　Works</button>
@@ -1152,6 +1152,36 @@ const TRACKS = [
 const pAudio = document.createElement("audio");
 pAudio.preload = "none"; pAudio.volume = .8;
 document.body.appendChild(pAudio);
+/* iOS ignores audio.volume (media volume is hardware-only there), so the
+   player is routed through a WebAudio gain and the slider drives that:
+   the gauge then works on iPhone too. The graph is built lazily on the
+   first play gesture; if anything fails, plain element playback stays. */
+let pVol = .8, pCtx = null, pGain = null;
+function audioCtx(){
+  if(pCtx) return pCtx;
+  try{
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if(!AC) return null;
+    pCtx = new AC();
+  }catch(e){ return null; }
+  return pCtx;
+}
+function pEnsureGain(){
+  const ctx = audioCtx();
+  if(!ctx) return;
+  if(!pGain){
+    try{
+      const src = ctx.createMediaElementSource(pAudio);
+      pGain = ctx.createGain(); pGain.gain.value = pVol;
+      src.connect(pGain); pGain.connect(ctx.destination);
+    }catch(e){ return; }
+  }
+  if(ctx.state === "suspended") ctx.resume();
+}
+function pSetVol(v){
+  pVol = v;
+  if(pGain) pGain.gain.value = v; else pAudio.volume = v;
+}
 let pIndex = 0;
 const pw = document.getElementById("pwidget");
 const pUI = {
@@ -1175,14 +1205,14 @@ function pSync(){
 function pLoad(i, autoplay){
   pIndex = (i + TRACKS.length) % TRACKS.length;
   const t = TRACKS[pIndex];
-  if(t.src){ pAudio.src = t.src; if(autoplay) pAudio.play(); }
+  if(t.src){ pAudio.src = t.src; if(autoplay){ pEnsureGain(); pAudio.play(); } }
   else { pAudio.removeAttribute("src"); pAudio.load(); }
   pSync();
 }
 function pToggle(){
   if(!TRACKS[pIndex].src) return;
   if(!pAudio.currentSrc){ pLoad(pIndex, true); return; }
-  if(pAudio.paused) pAudio.play(); else pAudio.pause();
+  if(pAudio.paused){ pEnsureGain(); pAudio.play(); } else pAudio.pause();
   pSync();
 }
 TRACKS.forEach((t, i) => {
@@ -1206,7 +1236,7 @@ pAudio.addEventListener("ended", () => {
 pw.querySelector(".mp-play").addEventListener("click", pToggle);
 pw.querySelector(".mp-prev").addEventListener("click", () => pLoad(pIndex - 1, !pAudio.paused));
 pw.querySelector(".mp-next").addEventListener("click", () => pLoad(pIndex + 1, !pAudio.paused));
-pw.querySelector(".mp-volbar").addEventListener("input", e => { pAudio.volume = e.target.value / 100; });
+pw.querySelector(".mp-volbar").addEventListener("input", e => { pSetVol(e.target.value / 100); });
 pUI.bar.addEventListener("pointerdown", e => {
   if(!pAudio.duration) return;
   const r = pUI.bar.getBoundingClientRect();
@@ -1265,7 +1295,20 @@ function birdSearch(){
   if(q.indexOf("ボイパ") >= 0 || q.indexOf("ボイスパーカッション") >= 0){
     try{
       if(window.__boipaAudio) window.__boipaAudio.pause();
-      const ba = new Audio("audio/boipa.mp3"); ba.volume = 0.5;
+      const ba = new Audio("audio/boipa.mp3");
+      /* same iOS volume limit as the player: use a gain when possible */
+      const bctx = audioCtx();
+      let brouted = false;
+      if(bctx){
+        try{
+          const bs = bctx.createMediaElementSource(ba);
+          const bg = bctx.createGain(); bg.gain.value = 0.5;
+          bs.connect(bg); bg.connect(bctx.destination);
+          if(bctx.state === "suspended") bctx.resume();
+          brouted = true;
+        }catch(e){}
+      }
+      if(!brouted) ba.volume = 0.5;
       window.__boipaAudio = ba;
       ba.play().catch(() => {});
     }catch(e){}
